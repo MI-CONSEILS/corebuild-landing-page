@@ -1,0 +1,67 @@
+[
+  {
+    "ref": "e5ea92b12e14e8afe138b2cebeb18037d0294462",
+    "name": "hf-20260621-130207-fce64662-c044-4b45-8116-50fc5a3",
+    "file": "/figma-assets/01-hf-20260621-130207-fce64662-c044-4b45-8116-50fc5a3.png"
+  },
+  {
+    "ref": "db01b15b5202e15381520bef44d2b3953472af57",
+    "name": "natural-materials",
+    "file": "/figma-assets/02-natural-materials.png"
+  },
+  {
+    "ref": "c30052f25aed62dd4549e04cb5a42859942cdc8d",
+    "name": "engineered-materials",
+    "file": "/figma-assets/03-engineered-materials.png"
+  },
+  {
+    "ref": "5e7b13826523d438f64f2b1a37b77cd2a3dfc31d",
+    "name": "lighting",
+    "file": "/figma-assets/04-lighting.png"
+  },
+  {
+    "ref": "b72c6e32836ef6b36c64c27d988ed156f3215f67",
+    "name": "electrical",
+    "file": "/figma-assets/05-electrical.png"
+  },
+  {
+    "ref": "6a223a1ba1a6b432894565a5a573d66d906726cc",
+    "name": "sanitary",
+    "file": "/figma-assets/06-sanitary.png"
+  },
+  {
+    "ref": "f88baf40ac221aeb2f20ad7b460e68bff0e8d420",
+    "name": "technical",
+    "file": "/figma-assets/07-technical.png"
+  },
+  {
+    "ref": "5bf651d12fb1d0e0cf2f698137b7304a337251f5",
+    "name": "image-5",
+    "file": "/figma-assets/08-image-5.png"
+  },
+  {
+    "ref": "29d5485144413a1d06eff4c1ec76b939f261f861",
+    "name": "image-5",
+    "file": "/figma-assets/09-image-5.png"
+  },
+  {
+    "ref": "99865a2e63b6bf2a278a76b426738d1cd836b0da",
+    "name": "image-6",
+    "file": "/figma-assets/10-image-6.png"
+  },
+  {
+    "ref": "4880b9c293d94cacf5cd37720ee2b348069bf25f",
+    "name": "image-7",
+    "file": "/figma-assets/11-image-7.png"
+  },
+  {
+    "ref": "64363390b8cd56f44690be7926f94301d18c7c5b",
+    "name": "processed-but-i-want-to-animate-the-imag-1",
+    "file": "/figma-assets/12-processed-but-i-want-to-animate-the-imag-1.png"
+  },
+  {
+    "ref": "c85ddc553a848ea27044e42b8fb6b22b0e6ced80",
+    "name": "logistics-at-dusk",
+    "file": "/figma-assets/13-logistics-at-dusk.png"
+  }
+]
