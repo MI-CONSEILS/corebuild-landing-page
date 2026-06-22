@@ -36,6 +36,8 @@ export function ScrollTextReveal({ text, className }: ScrollTextRevealProps) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       wordNodes.forEach((word) => {
         word.style.color = mixColor(1);
+        word.style.filter = "blur(0px)";
+        word.style.opacity = "1";
       });
       return;
     }
@@ -44,17 +46,19 @@ export function ScrollTextReveal({ text, className }: ScrollTextRevealProps) {
 
     const update = () => {
       frame = 0;
-      const rect = paragraph.getBoundingClientRect();
+      const section = paragraph.closest<HTMLElement>("[data-scroll-reveal-section]");
+      const rect = section?.getBoundingClientRect() ?? paragraph.getBoundingClientRect();
       const viewportHeight = window.innerHeight || 1;
-      const startLine = viewportHeight * 0.78;
-      const endLine = viewportHeight * 0.24;
-      const distance = rect.height + startLine - endLine;
-      const progress = clamp((startLine - rect.top) / distance);
+      const scrollDistance = Math.max(rect.height - viewportHeight, 1);
+      const progress = clamp(-rect.top / scrollDistance);
       const activeWord = progress * wordNodes.length;
 
       wordNodes.forEach((word, index) => {
         const fill = clamp((activeWord - index) / 1.25);
+        const transitionBlur = Math.sin(fill * Math.PI) * 3;
         word.style.color = mixColor(fill);
+        word.style.filter = `blur(${transitionBlur}px)`;
+        word.style.opacity = "1";
       });
     };
 
