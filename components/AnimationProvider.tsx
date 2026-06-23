@@ -92,12 +92,29 @@ function loadScript(id: string, src: string) {
   });
 }
 
-// Vanilla cascading blur reveal. The headline reveals as one block (its
-// continuous gradient lives on the element itself, so it must stay intact); the
-// subtitle is split into words for a left-to-right cascade; the CTA reveals
-// last. The hidden state lives on the `.reveal-word` / `.reveal-block` classes
-// (added here by JS), so if this never runs the text stays fully visible — the
-// animation is a pure enhancement with no opacity dependency.
+function syncHeadlineGradient(headline: HTMLElement) {
+  const headlineRect = headline.getBoundingClientRect();
+
+  headline.style.setProperty(
+    "--headline-gradient-width",
+    `${headlineRect.width}px`
+  );
+
+  headline
+    .querySelectorAll<HTMLElement>(".hero__headline-word")
+    .forEach((word) => {
+      const wordRect = word.getBoundingClientRect();
+      word.style.setProperty(
+        "--headline-word-x",
+        `${wordRect.left - headlineRect.left}px`
+      );
+    });
+}
+
+// Vanilla cascading blur reveal. Both text lines are split into words for a
+// left-to-right cascade, followed by the CTA. The hidden state lives on the
+// `.reveal-word` / `.reveal-block` classes (added here by JS), so if this never
+// runs the text stays fully visible and the animation remains an enhancement.
 function revealHeroWords() {
   const hero = document.querySelector<HTMLElement>(".hero");
   if (!hero || hero.dataset.heroRevealed) return;
@@ -105,12 +122,24 @@ function revealHeroWords() {
 
   let index = 0;
 
-  // Headline — reveal as a single block to preserve the continuous gradient
+  // Headline — split into words while preserving one continuous gradient.
   const headline = hero.querySelector<HTMLElement>(".hero__headline");
-  if (headline) {
-    headline.style.setProperty("--reveal-i", String(index));
-    index += 2;
-    headline.classList.add("reveal-block");
+  if (headline && !headline.dataset.split) {
+    const words = (headline.textContent || "").trim().split(/\s+/);
+    headline.textContent = "";
+    words.forEach((text, i) => {
+      const span = document.createElement("span");
+      span.className = "hero__headline-word reveal-word";
+      span.style.setProperty("--reveal-i", String(index++));
+      span.textContent = text;
+      headline.appendChild(span);
+      if (i < words.length - 1) {
+        headline.appendChild(document.createTextNode(" "));
+      }
+    });
+    headline.dataset.split = "true";
+    headline.classList.add("hero__headline--split");
+    syncHeadlineGradient(headline);
   }
 
   // Subtitle — split into words once for the cascade
@@ -167,6 +196,17 @@ export function AnimationProvider() {
 
     // Vanilla cascading blur reveal — runs on page load, independent of GSAP.
     revealHeroWords();
+
+    const syncHeroHeadline = () => {
+      const headline =
+        document.querySelector<HTMLElement>(".hero__headline--split");
+      if (headline) syncHeadlineGradient(headline);
+    };
+    window.addEventListener("resize", syncHeroHeadline);
+    cleanupFns.push(() => window.removeEventListener("resize", syncHeroHeadline));
+    void document.fonts.ready.then(() => {
+      if (!cancelled) syncHeroHeadline();
+    });
 
     const runCleanup = () => {
       cancelled = true;

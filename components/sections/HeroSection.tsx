@@ -14,11 +14,17 @@ export function HeroSection() {
         loop
         muted
         playsInline
-        preload="metadata"
+        preload="auto"
       >
+        <source
+          src={cloudinaryAssets.heroVideoMobile}
+          type="video/mp4"
+          media="(max-width: 900px)"
+        />
         <source src={cloudinaryAssets.heroVideo} type="video/mp4" />
       </video>
       <div className="hero__wash" aria-hidden="true" />
+      <div className="hero__bottom-vignette" aria-hidden="true" />
 
       <SiteHeader />
 
@@ -37,6 +43,26 @@ export function HeroSection() {
           Tell us what you&apos;re building
         </AnimatedButton>
       </div>
+
+      <a className="hero__scroll-cue" href="#why" aria-label="Scroll to Why CoreBuild">
+        <span>Scroll</span>
+        <svg
+          className="hero__scroll-chevron"
+          width="24"
+          height="14"
+          viewBox="0 0 24 14"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M2 2L12 12L22 2"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </a>
     </section>
   );
 }

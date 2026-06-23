@@ -6,6 +6,7 @@ const whyText =
 export function WhySection() {
   return (
     <section
+      id="why"
       className="value-section"
       aria-labelledby="why-title"
       data-scroll-reveal-section
