@@ -129,7 +129,10 @@
 
 *, ::before, ::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+/* Smooth scrolling is handled by Lenis (see AnimationProvider); a CSS
+   scroll-behavior here would fight it. Reduced-motion users get instant
+   native jumps because Lenis is never initialised for them. */
+html { scroll-behavior: auto; }
 
 body {
   margin: 0;
@@ -1007,7 +1010,7 @@ img { object-fit: cover; }
   font-size: 12px;
   font-weight: 400;
   color: var(--col-footer-text);
-  opacity: 0.60;
+  opacity: 0.78;
   margin: 0;
 }
 

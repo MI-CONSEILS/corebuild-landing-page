@@ -2,96 +2,6 @@
 
 import { useEffect } from "react";
 
-type GsapTween = {
-  kill: () => void;
-  scrollTrigger?: { kill: () => void };
-};
-
-type Gsap = {
-  killTweensOf: (targets: unknown) => void;
-  registerPlugin: (...plugins: unknown[]) => void;
-  set: (targets: unknown, vars: Record<string, unknown>) => void;
-  to: (targets: unknown, vars: Record<string, unknown>) => GsapTween;
-  from: (targets: unknown, vars: Record<string, unknown>) => GsapTween;
-  fromTo: (
-    targets: unknown,
-    fromVars: Record<string, unknown>,
-    toVars: Record<string, unknown>
-  ) => GsapTween;
-  ticker: {
-    add: (callback: (time: number) => void) => void;
-    remove: (callback: (time: number) => void) => void;
-    lagSmoothing: (threshold: number) => void;
-  };
-  utils: {
-    toArray: <T extends HTMLElement>(selector: string) => T[];
-  };
-};
-
-type ScrollTriggerGlobal = {
-  refresh: () => void;
-  update: () => void;
-};
-
-type LenisInstance = {
-  destroy: () => void;
-  on: (event: "scroll", callback: () => void) => void;
-  raf: (time: number) => void;
-};
-
-type LenisConstructor = new (options: {
-  duration: number;
-  lerp: number;
-  smoothWheel: boolean;
-  wheelMultiplier: number;
-}) => LenisInstance;
-
-declare global {
-  interface Window {
-    gsap?: Gsap;
-    ScrollTrigger?: ScrollTriggerGlobal;
-    Lenis?: LenisConstructor;
-  }
-}
-
-const scripts = [
-  {
-    id: "gsap-core",
-    src: "https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"
-  },
-  {
-    id: "gsap-scroll-trigger",
-    src: "https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"
-  },
-  {
-    id: "lenis",
-    src: "https://cdn.jsdelivr.net/npm/lenis@1.3.0/dist/lenis.min.js"
-  }
-];
-
-function loadScript(id: string, src: string) {
-  return new Promise<void>((resolve, reject) => {
-    const existing = document.getElementById(id) as HTMLScriptElement | null;
-
-    if (existing?.dataset.loaded === "true") {
-      resolve();
-      return;
-    }
-
-    const script = existing ?? document.createElement("script");
-    script.id = id;
-    script.src = src;
-    script.async = false;
-    script.onload = () => {
-      script.dataset.loaded = "true";
-      resolve();
-    };
-    script.onerror = () => reject(new Error(`Unable to load ${src}`));
-
-    if (!existing) document.head.appendChild(script);
-  });
-}
-
 function syncHeadlineGradient(headline: HTMLElement) {
   const headlineRect = headline.getBoundingClientRect();
 
@@ -111,64 +21,9 @@ function syncHeadlineGradient(headline: HTMLElement) {
     });
 }
 
-// Vanilla cascading blur reveal. Both text lines are split into words for a
-// left-to-right cascade, followed by the CTA. The hidden state lives on the
-// `.reveal-word` / `.reveal-block` classes (added here by JS), so if this never
-// runs the text stays fully visible and the animation remains an enhancement.
-function revealHeroWords() {
-  const hero = document.querySelector<HTMLElement>(".hero");
-  if (!hero || hero.dataset.heroRevealed) return;
-  hero.dataset.heroRevealed = "true";
-
-  let index = 0;
-
-  // Headline — split into words while preserving one continuous gradient.
-  const headline = hero.querySelector<HTMLElement>(".hero__headline");
-  if (headline && !headline.dataset.split) {
-    const words = (headline.textContent || "").trim().split(/\s+/);
-    headline.textContent = "";
-    words.forEach((text, i) => {
-      const span = document.createElement("span");
-      span.className = "hero__headline-word reveal-word";
-      span.style.setProperty("--reveal-i", String(index++));
-      span.textContent = text;
-      headline.appendChild(span);
-      if (i < words.length - 1) {
-        headline.appendChild(document.createTextNode(" "));
-      }
-    });
-    headline.dataset.split = "true";
-    headline.classList.add("hero__headline--split");
-    syncHeadlineGradient(headline);
-  }
-
-  // Subtitle — split into words once for the cascade
-  const sub = hero.querySelector<HTMLElement>(".hero__sub");
-  if (sub && !sub.dataset.split) {
-    const words = (sub.textContent || "").trim().split(/\s+/);
-    sub.textContent = "";
-    words.forEach((text, i) => {
-      const span = document.createElement("span");
-      span.className = "hero__sub-word reveal-word";
-      span.style.setProperty("--reveal-i", String(index++));
-      span.textContent = text;
-      sub.appendChild(span);
-      if (i < words.length - 1) sub.appendChild(document.createTextNode(" "));
-    });
-    sub.dataset.split = "true";
-  }
-
-  // CTA — reveal as a block, last in the cascade
-  const actions = hero.querySelector<HTMLElement>(".hero__actions");
-  if (actions) {
-    actions.style.setProperty("--reveal-i", String(index));
-    actions.classList.add("reveal-block");
-  }
-}
-
 function revealWithoutMotion() {
-  // Hero text is driven by CSS (see revealHeroWords); this only forces the
-  // scroll-reveal words visible when GSAP/motion is unavailable.
+  // The hero cascade is pure CSS (word spans are server-rendered). This only
+  // forces the scroll-reveal section words visible when GSAP is unavailable.
   document
     .querySelectorAll<HTMLElement>("[data-reveal-word]")
     .forEach((element) => {
@@ -194,14 +49,14 @@ export function AnimationProvider() {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const cleanupFns: Array<() => void> = [];
 
-    // Vanilla cascading blur reveal — runs on page load, independent of GSAP.
-    revealHeroWords();
-
+    // The hero headline gradient is sliced per-word in CSS; recompute the
+    // offsets once fonts are ready and on resize so it stays continuous.
     const syncHeroHeadline = () => {
       const headline =
         document.querySelector<HTMLElement>(".hero__headline--split");
       if (headline) syncHeadlineGradient(headline);
     };
+    syncHeroHeadline();
     window.addEventListener("resize", syncHeroHeadline);
     cleanupFns.push(() => window.removeEventListener("resize", syncHeroHeadline));
     void document.fonts.ready.then(() => {
@@ -219,10 +74,13 @@ export function AnimationProvider() {
     }
 
     const initAnimations = async () => {
+      let gsapMod, scrollTriggerMod, lenisMod;
       try {
-        for (const script of scripts) {
-          await loadScript(script.id, script.src);
-        }
+        [gsapMod, scrollTriggerMod, lenisMod] = await Promise.all([
+          import("gsap"),
+          import("gsap/ScrollTrigger"),
+          import("lenis")
+        ]);
       } catch {
         revealWithoutMotion();
         return;
@@ -230,36 +88,39 @@ export function AnimationProvider() {
 
       if (cancelled) return;
 
-      const gsap = window.gsap;
-      const ScrollTrigger = window.ScrollTrigger;
-
-      if (!gsap || !ScrollTrigger) {
-        revealWithoutMotion();
-        return;
-      }
+      const gsap = gsapMod.default;
+      const ScrollTrigger = scrollTriggerMod.ScrollTrigger;
+      const Lenis = lenisMod.default;
 
       gsap.registerPlugin(ScrollTrigger);
 
-      let lenis: LenisInstance | null = null;
-      const Lenis = window.Lenis;
-      const updateLenis = (time: number) => {
-        lenis?.raf(time * 1000);
+      const lenis = new Lenis({
+        duration: 1.15,
+        lerp: 0.08,
+        smoothWheel: true,
+        wheelMultiplier: 0.9
+      });
+      const updateLenis = (time: number) => lenis.raf(time * 1000);
+      lenis.on("scroll", ScrollTrigger.update);
+      gsap.ticker.add(updateLenis);
+      gsap.ticker.lagSmoothing(0);
+
+      // In-page anchor links route through Lenis so the smooth scroll is
+      // consistent with the wheel (CSS scroll-behavior is intentionally off).
+      const onAnchorClick = (event: MouseEvent) => {
+        const link = (event.target as HTMLElement | null)?.closest<HTMLAnchorElement>(
+          'a[href^="#"]'
+        );
+        if (!link) return;
+        const hash = link.getAttribute("href");
+        if (!hash || hash === "#") return;
+        const target = document.querySelector<HTMLElement>(hash);
+        if (!target) return;
+        event.preventDefault();
+        lenis.scrollTo(target);
       };
-
-      if (Lenis) {
-        lenis = new Lenis({
-          duration: 1.15,
-          lerp: 0.08,
-          smoothWheel: true,
-          wheelMultiplier: 0.9
-        });
-        lenis.on("scroll", ScrollTrigger.update);
-        gsap.ticker.add(updateLenis);
-        gsap.ticker.lagSmoothing(0);
-      }
-
-      // Hero intro is handled by the vanilla CSS cascade (revealHeroWords).
-      // GSAP here only drives button hovers and the scroll-reveal section.
+      document.addEventListener("click", onAnchorClick);
+      cleanupFns.push(() => document.removeEventListener("click", onAnchorClick));
 
       gsap.utils.toArray<HTMLElement>("[data-gsap-button]").forEach((button) => {
         const icon = button.querySelector<HTMLElement>(".animated-button__icon");
@@ -391,10 +252,8 @@ export function AnimationProvider() {
       ScrollTrigger.refresh();
 
       cleanupFns.push(() => {
-        if (lenis) {
-          gsap.ticker.remove(updateLenis);
-          lenis.destroy();
-        }
+        gsap.ticker.remove(updateLenis);
+        lenis.destroy();
       });
     };
 
