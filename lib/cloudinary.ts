@@ -15,8 +15,8 @@ function getCloudinaryVideoUrl(asset: CloudinaryVideoAsset) {
 
 export const cloudinaryAssets = {
   heroVideo: getCloudinaryVideoUrl({
-    publicId: "WhatsApp_Video_2026-06-22_at_13.57.20_rvdmje",
-    version: "1782133252",
+    publicId: "hf_20260621_130207_fce64662-c044-4b45-8116-50fc5a3ff6eb_1_xc0dae",
+    version: "1782234719",
     format: "mp4"
   })
 } as const;

@@ -1,14 +1,13 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { AnimatedButton } from "@/components/AnimatedButton";
 
 const contactItems: Array<{ label: string; value: ReactNode }> = [
   {
     label: "HEADQUARTERS",
     value: (
       <>
-        Baiyun Design District,
-        <br />
-        Guangzhou, China
+        Baiyun Design District,<br />Guangzhou, China
       </>
     )
   },
@@ -27,30 +26,40 @@ export function ContactSection() {
     <section className="contact-section" id="contact" aria-labelledby="contact-title">
       <div className="contact-inner">
         <div className="contact-copy">
-          <h2 id="contact-title">
+          <h2 id="contact-title" className="cta-headline">
             Let&apos;s build it,
-            <br />
             <em>together.</em>
           </h2>
-          <p>
+          <p className="cta-body">
             Tell us about your project. We&apos;ll come back with a tailored
             sourcing strategy and material library.
           </p>
-          <a className="button button--red" href="mailto:welcome@corebuild-int.com">
+          <AnimatedButton
+            className="btn-cta"
+            href="mailto:welcome@corebuild-int.com"
+            variant="primary"
+          >
             Start a project
-          </a>
+          </AnimatedButton>
         </div>
+
         <div className="contact-details">
           <div className="contact-grid">
             {contactItems.map((item) => (
               <div className="contact-item" key={item.label}>
-                <p>{item.label}</p>
-                <strong>{item.value}</strong>
+                <p className="contact-label">{item.label}</p>
+                <div className="contact-value">{item.value}</div>
               </div>
             ))}
           </div>
           <div className="logistics-image">
-            <Image src="/figma-assets/13-logistics-at-dusk.png" alt="" fill sizes="538px" />
+            <Image
+              src="/figma-assets/13-logistics-at-dusk.png"
+              alt=""
+              fill
+              sizes="(max-width: 900px) 100vw, 538px"
+              style={{ objectFit: "cover", mixBlendMode: "saturation" }}
+            />
           </div>
         </div>
       </div>

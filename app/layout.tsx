@@ -1,18 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { AnimationProvider } from "@/components/AnimationProvider";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-primary-sans",
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  display: "swap"
-});
-
 export const metadata: Metadata = {
-  title: "Corebuild | Modern Construction Delivery",
+  title: "CoreBuild | Premium Materials from China",
   description:
-    "A construction landing page for Corebuild, focused on planning, delivery, and premium build execution."
+    "Premium construction materials sourced from Guangzhou's manufacturing network. Single partner from factory floor to finished site."
 };
 
 export default function RootLayout({
@@ -21,8 +14,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body>{children}</body>
+    <html lang="en">
+      <body>
+        <AnimationProvider />
+        {children}
+      </body>
     </html>
   );
 }
