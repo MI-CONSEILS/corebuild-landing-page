@@ -11,12 +11,14 @@ export function ScrollTextReveal({ text, className }: ScrollTextRevealProps) {
   const words = useMemo(() => text.split(/(\s+)/), [text]);
 
   return (
-    <p className={className} aria-label={text}>
+    <p className={className}>
       {words.map((word, index) => {
         if (/^\s+$/.test(word)) return word;
 
+        // No aria-hidden: inline spans read as one continuous sentence, so the
+        // paragraph needs no aria-label (which is prohibited on <p> anyway).
         return (
-          <span aria-hidden="true" data-reveal-word key={`${word}-${index}`}>
+          <span data-reveal-word key={`${word}-${index}`}>
             {word}
           </span>
         );
