@@ -63,6 +63,18 @@ export function CatalogSection() {
         <div className="catalog-grid">
           {catalogItems.map((item, index) => (
             <article className="catalog-card" key={item.title}>
+              <h3
+                className="catalog-card__heading"
+                data-word-reveal
+                data-word-reveal-speed="regular"
+                style={
+                  {
+                    "--word-reveal-delay": `${(index % 3) * 80}ms`
+                  } as CSSProperties
+                }
+              >
+                <WordReveal text={item.title} />
+              </h3>
               <div className="catalog-card__image">
                 <Image
                   src={item.image}
@@ -85,18 +97,10 @@ export function CatalogSection() {
                 <p className="catalog-eyebrow">
                   <WordReveal text={item.eyebrow} />
                 </p>
-                <h3>
-                  <WordReveal
-                    text={item.title}
-                    start={getWordCount(item.eyebrow)}
-                  />
-                </h3>
                 <p>
                   <WordReveal
                     text={item.description}
-                    start={
-                      getWordCount(item.eyebrow) + getWordCount(item.title)
-                    }
+                    start={getWordCount(item.eyebrow)}
                   />
                 </p>
               </div>

@@ -31,6 +31,12 @@ const heroVideoAsset = {
   format: "mp4"
 } as const;
 
+const projectVideoAsset = {
+  publicId: "maison_huawhv",
+  version: "1782304620",
+  format: "mp4"
+} as const;
+
 export const cloudinaryAssets = {
   heroVideo: getCloudinaryVideoUrl(
     heroVideoAsset,
@@ -42,6 +48,14 @@ export const cloudinaryAssets = {
   ),
   heroPoster: getCloudinaryPosterUrl(
     heroVideoAsset,
+    "so_0,f_jpg,q_auto:good,w_1600"
+  ),
+  projectVideo: getCloudinaryVideoUrl(
+    projectVideoAsset,
+    "f_mp4,q_auto:good,vc_h264,w_1600"
+  ),
+  projectPoster: getCloudinaryPosterUrl(
+    projectVideoAsset,
     "so_0,f_jpg,q_auto:good,w_1600"
   )
 } as const;

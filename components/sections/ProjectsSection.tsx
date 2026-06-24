@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { getWordCount, WordReveal } from "@/components/WordReveal";
+import { cloudinaryAssets } from "@/lib/cloudinary";
 
 const projectsTitle = "Selected supply projects.";
 const projectsSub = "From European luxury retail to MENA hospitality.";
@@ -26,14 +26,18 @@ export function ProjectsSection() {
         </div>
 
         <div className="project-frame">
-          <Image
+          <video
             className="project-image"
-            src="/figma-assets/12-processed-but-i-want-to-animate-the-imag-1.png"
-            alt="The Grand Atrium — luxury interior with custom travertine"
-            fill
-            sizes="(max-width: 900px) 100vw, 1140px"
-            style={{ objectFit: "cover" }}
-          />
+            aria-hidden="true"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            poster={cloudinaryAssets.projectPoster}
+          >
+            <source src={cloudinaryAssets.projectVideo} type="video/mp4" />
+          </video>
         </div>
 
         <p className="project-caption">

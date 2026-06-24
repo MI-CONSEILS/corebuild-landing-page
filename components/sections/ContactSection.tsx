@@ -1,6 +1,6 @@
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { AnimatedButton } from "@/components/AnimatedButton";
+import { ContactForm } from "@/components/ContactForm";
 import { getWordCount, WordReveal } from "@/components/WordReveal";
 
 const contactTitle = "Let's build it,";
@@ -66,15 +66,7 @@ export function ContactSection() {
               </div>
             ))}
           </div>
-          <div className="logistics-image">
-            <Image
-              src="/figma-assets/13-logistics-at-dusk.png"
-              alt=""
-              fill
-              sizes="(max-width: 900px) 100vw, 538px"
-              style={{ objectFit: "cover", mixBlendMode: "saturation" }}
-            />
-          </div>
+          <ContactForm />
         </div>
       </div>
     </section>

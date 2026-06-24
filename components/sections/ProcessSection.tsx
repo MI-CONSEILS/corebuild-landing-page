@@ -1,49 +1,52 @@
 import Image from "next/image";
-import { WordReveal } from "@/components/WordReveal";
+import { getWordCount, WordReveal } from "@/components/WordReveal";
 
 const processSectionTitle = "From brief to site";
+// ponytail: section subtitle is placeholder — retune later.
+const processSectionSub = "Six steps from first brief to delivered site.";
 
-// ponytail: placeholder copy + reused figma-assets — wording/images get tuned later.
 const steps = [
   {
     number: "01",
-    title: "We Start by Understanding Your Brief in Detail",
-    body: "Reading of project specs, BOQ, design intent, budget and timeline to lock down exactly what the project needs.",
-    note: "100% of specs, BOQ & design intent reviewed before a single quote — vs. agents who price first and clarify later",
+    title: "Brief",
+    body: "Specs, BOQ, budget, timeline analysis",
     image: "/figma-assets/10-image-6.png",
     thumbs: ["08-image-5", "10-image-6", "11-image-7"]
   },
   {
     number: "02",
-    title: "We Source and Shortlist the Right Suppliers",
-    body: "Your requirements are mapped against vetted Guangzhou manufacturers — samples compared and pricing locked before anything ships.",
-    note: "Every shortlist is benchmarked across at least three vetted factories — never a single-source markup",
+    title: "Study",
+    body: "Material, finish and supplier strategy",
     image: "/figma-assets/08-image-5.png",
     thumbs: ["02-natural-materials", "03-engineered-materials", "04-lighting"]
   },
   {
     number: "03",
-    title: "We Run Quality Control on Every Batch",
-    body: "On-site inspection, material testing and pre-shipment checks against your spec, so defects never leave the factory floor.",
-    note: "Pre-shipment inspection on 100% of orders — issues caught in Guangzhou, not on your site",
+    title: "Sourcing",
+    body: "Factory Shortlist, quote, negotiation",
     image: "/figma-assets/11-image-7.png",
     thumbs: ["05-electrical", "06-sanitary", "07-technical"]
   },
   {
     number: "04",
-    title: "We Consolidate and Handle the Logistics",
-    body: "Multiple suppliers, one consolidated shipment. Customs, freight and documentation managed end to end.",
-    note: "One consolidated container instead of five — lower freight, fewer customs touchpoints",
+    title: "Samples",
+    body: "Validation samples and approvals",
     image: "/figma-assets/04-lighting.png",
-    thumbs: ["12-processed-but-i-want-to-animate-the-imag-1", "13-logistics-at-dusk", "02-natural-materials"]
+    thumbs: ["02-natural-materials", "06-sanitary", "03-engineered-materials"]
   },
   {
     number: "05",
-    title: "We Deliver to Site and Stay Accountable",
-    body: "Coordinated delivery to your project, with one team owning the outcome from first sketch to final handover.",
-    note: "One contract, one invoice, one team accountable from brief to delivered site",
+    title: "Logistics",
+    body: "Consolidation, export documents and exports",
+    image: "/figma-assets/13-logistics-at-dusk.png",
+    thumbs: ["12-processed-but-i-want-to-animate-the-imag-1", "13-logistics-at-dusk", "02-natural-materials"]
+  },
+  {
+    number: "06",
+    title: "Validate",
+    body: "Technical review and factory capability audits",
     image: "/figma-assets/07-technical.png",
-    thumbs: ["03-engineered-materials", "05-electrical", "06-sanitary"]
+    thumbs: ["03-engineered-materials", "05-electrical", "07-technical"]
   }
 ];
 
@@ -64,25 +67,32 @@ export function ProcessSection() {
           <h2 id="process-title">
             <WordReveal text={processSectionTitle} />
           </h2>
+          <p className="section-sub">
+            <WordReveal
+              text={processSectionSub}
+              start={getWordCount(processSectionTitle)}
+            />
+          </p>
         </div>
 
         <div className="process-stage">
           {steps.map((step) => (
             <div className="process-slide" data-process-slide key={step.number}>
               <div className="process-grid">
-                <div className="process-copy">
+                <div className="process-copy" data-step-reveal>
                   <div>
                     <p className="process-number">{step.number}</p>
-                    <h3
-                      className="process-title"
-                      data-word-reveal
-                      data-word-reveal-speed="regular"
-                    >
+                    <h3 className="process-title">
                       <WordReveal text={step.title} />
                     </h3>
                   </div>
-                  <div>
-                    <p className="process-body">{step.body}</p>
+                  <div className="process-copy__detail">
+                    <p className="process-body">
+                      <WordReveal
+                        text={step.body}
+                        start={getWordCount(step.title)}
+                      />
+                    </p>
                     <div className="thumb-row" aria-hidden="true">
                       {step.thumbs.map((thumb) => (
                         <div key={thumb}>
@@ -107,7 +117,6 @@ export function ProcessSection() {
                     sizes="(max-width: 900px) 100vw, 516px"
                     style={{ objectFit: "cover" }}
                   />
-                  <div className="process-note">{step.note}</div>
                 </div>
               </div>
             </div>

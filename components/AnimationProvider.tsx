@@ -344,7 +344,8 @@ export function AnimationProvider() {
       cleanupFns.push(() => projectMorphMedia.revert());
 
       // "From brief to site" — the sticky inner (CSS) holds the frame while we
-      // scrub through the 5 steps, crossfading one stacked slide to the next.
+      // scrub through the steps, crossfading one stacked slide to the next and
+      // replaying each step's word-reveal as its number changes.
       const processMedia = gsap.matchMedia();
       processMedia.add("(min-width: 901px)", () => {
         const section = document.querySelector<HTMLElement>("[data-process-pin]");
@@ -354,30 +355,51 @@ export function AnimationProvider() {
 
         if (!section || slides.length < 2) return;
 
+        const groups = slides.map((slide) =>
+          slide.querySelector<HTMLElement>("[data-step-reveal]")
+        );
+
+        // Restart the same blur/fade cascade used by the hero/catalogue.
+        const replayReveal = (group: HTMLElement | null) => {
+          if (!group) return;
+          group.classList.remove("is-word-reveal-visible");
+          void group.offsetWidth; // force reflow so the animation re-runs
+          group.classList.add("is-word-reveal-visible");
+        };
+
+        groups.forEach((group) => group?.classList.add("is-word-reveal-ready"));
+
         gsap.set(slides, { autoAlpha: 0 });
         gsap.set(slides[0], { autoAlpha: 1 });
+        replayReveal(groups[0]);
 
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: section,
             start: "top top",
             end: "bottom bottom",
-            scrub: true,
-            markers: true // ponytail: debug — drop once the timing feels right
+            scrub: true
           }
         });
 
-        // Hold, then crossfade; ~one viewport of scroll between each step.
+        // Hold, then crossfade to the next step and replay its reveal.
         for (let i = 1; i < slides.length; i++) {
           timeline
             .to(slides[i - 1], { autoAlpha: 0, duration: 0.4 }, i)
-            .to(slides[i], { autoAlpha: 1, duration: 0.4 }, i);
+            .to(slides[i], { autoAlpha: 1, duration: 0.4 }, i)
+            .call(replayReveal, [groups[i]], i);
         }
 
         return () => {
           timeline.scrollTrigger?.kill();
           timeline.kill();
           gsap.set(slides, { clearProps: "all" });
+          groups.forEach((group) =>
+            group?.classList.remove(
+              "is-word-reveal-ready",
+              "is-word-reveal-visible"
+            )
+          );
         };
       });
       cleanupFns.push(() => processMedia.revert());
