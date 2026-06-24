@@ -63,6 +63,31 @@ export function AnimationProvider() {
       if (!cancelled) syncHeroHeadline();
     });
 
+    const revealGroups = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-word-reveal]")
+    );
+    if ("IntersectionObserver" in window) {
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-word-reveal-visible");
+            revealObserver.unobserve(entry.target);
+          });
+        },
+        {
+          rootMargin: "0px 0px -10% 0px",
+          threshold: 0.15
+        }
+      );
+
+      revealGroups.forEach((group) => {
+        group.classList.add("is-word-reveal-ready");
+        revealObserver.observe(group);
+      });
+      cleanupFns.push(() => revealObserver.disconnect());
+    }
+
     const runCleanup = () => {
       cancelled = true;
       cleanupFns.forEach((cleanup) => cleanup());
@@ -248,6 +273,114 @@ export function AnimationProvider() {
           tween.kill();
         });
       });
+
+      const projectMorphMedia = gsap.matchMedia();
+      projectMorphMedia.add("(min-width: 901px)", () => {
+        const section = document.querySelector<HTMLElement>("[data-project-morph]");
+        const frame = section?.querySelector<HTMLElement>(".project-frame");
+        const image = section?.querySelector<HTMLElement>(".project-image");
+        const caption = section?.querySelector<HTMLElement>(".project-caption");
+
+        if (!section || !frame || !image || !caption) return;
+
+        gsap.set(frame, {
+          "--project-inset": "34%"
+        });
+        gsap.set(image, {
+          scale: 1.14
+        });
+        gsap.set(caption, {
+          opacity: 0,
+          y: 18
+        });
+
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            // Morph completes within one viewport of scroll; the taller section
+            // (see .projects-section) then holds the full-size image before exit.
+            end: () => "+=" + window.innerHeight,
+            scrub: 1
+          }
+        });
+
+        timeline
+          .to(
+            frame,
+            {
+              "--project-inset": "0%",
+              duration: 1,
+              ease: "none"
+            },
+            0
+          )
+          .to(
+            image,
+            {
+              scale: 1,
+              duration: 1,
+              ease: "none"
+            },
+            0
+          )
+          .to(
+            caption,
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.25,
+              ease: "power2.out"
+            },
+            0.75
+          );
+
+        return () => {
+          timeline.scrollTrigger?.kill();
+          timeline.kill();
+          gsap.set([frame, image, caption], { clearProps: "all" });
+        };
+      });
+      cleanupFns.push(() => projectMorphMedia.revert());
+
+      // "From brief to site" — the sticky inner (CSS) holds the frame while we
+      // scrub through the 5 steps, crossfading one stacked slide to the next.
+      const processMedia = gsap.matchMedia();
+      processMedia.add("(min-width: 901px)", () => {
+        const section = document.querySelector<HTMLElement>("[data-process-pin]");
+        const slides = section
+          ? gsap.utils.toArray<HTMLElement>("[data-process-slide]", section)
+          : [];
+
+        if (!section || slides.length < 2) return;
+
+        gsap.set(slides, { autoAlpha: 0 });
+        gsap.set(slides[0], { autoAlpha: 1 });
+
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: "top top",
+            end: "bottom bottom",
+            scrub: true,
+            markers: true // ponytail: debug — drop once the timing feels right
+          }
+        });
+
+        // Hold, then crossfade; ~one viewport of scroll between each step.
+        for (let i = 1; i < slides.length; i++) {
+          timeline
+            .to(slides[i - 1], { autoAlpha: 0, duration: 0.4 }, i)
+            .to(slides[i], { autoAlpha: 1, duration: 0.4 }, i);
+        }
+
+        return () => {
+          timeline.scrollTrigger?.kill();
+          timeline.kill();
+          gsap.set(slides, { clearProps: "all" });
+        };
+      });
+      cleanupFns.push(() => processMedia.revert());
 
       ScrollTrigger.refresh();
 

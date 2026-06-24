@@ -520,6 +520,45 @@ img { object-fit: cover; }
   }
 }
 
+/* Shared viewport reveal. Content remains visible until JS marks a group ready,
+   so a script failure never leaves headings or card copy hidden. */
+[data-word-reveal-speed="fast"] {
+  --word-reveal-duration: 0.65s;
+  --word-reveal-stagger: 40ms;
+}
+
+[data-word-reveal-speed="regular"] {
+  --word-reveal-duration: 0.9s;
+  --word-reveal-stagger: 60ms;
+}
+
+.word-reveal-word {
+  display: inline-block;
+}
+
+.is-word-reveal-ready .word-reveal-word {
+  opacity: 0;
+  filter: blur(10px);
+  transform: translateY(0.12em);
+}
+
+.is-word-reveal-ready.is-word-reveal-visible .word-reveal-word {
+  animation: content-word-reveal var(--word-reveal-duration, 0.8s)
+    cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(
+    var(--word-reveal-delay, 0ms) +
+    var(--word-i, 0) * var(--word-reveal-stagger, 50ms)
+  );
+}
+
+@keyframes content-word-reveal {
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+
 /* ===========================
    SECTION SHARED
    =========================== */
@@ -564,18 +603,24 @@ img { object-fit: cover; }
 .value-section__sticky {
   position: sticky;
   top: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1140px);
+  align-content: center;
   justify-content: center;
+  justify-items: center;
   min-height: 100vh;
-  padding: var(--section-py) var(--section-px);
+  min-height: 100svh;
+  padding-inline: var(--section-px);
   gap: 46px;
 }
 
+.value-section__sticky > * {
+  width: 100%;
+}
+
 .value-copy {
-  width: var(--container);
-  max-width: 1140px;
+  margin: 0;
+  width: 100%;
   font-family: var(--font-sans);
   font-size: 40px;
   font-weight: 500;
@@ -616,8 +661,13 @@ img { object-fit: cover; }
 .catalog-card {
   display: flex;
   flex-direction: column;
-  gap: 4px;
   filter: drop-shadow(var(--sh-card));
+}
+
+.catalog-card__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .catalog-card__image {
@@ -661,23 +711,52 @@ img { object-fit: cover; }
    =========================== */
 
 .process-section {
-  padding: 40px var(--section-px);
-  overflow: hidden;
+  --process-frame-height: clamp(470px, calc(100svh - 150px), 673px);
+  position: relative;
+  /* Tall so the sticky inner stays put while the 5 steps scrub past — the same
+     sticky-stage pattern as Why/Projects. (GSAP pin:true fights those sticky
+     siblings, so we pin with CSS instead.) */
+  height: 500svh;
+  overflow: clip;
 }
 
 .process-inner {
-  max-width: 1140px;
-  margin: 0 auto;
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
-  gap: 46px;
+  justify-content: center;
+  gap: clamp(24px, 4vh, 46px);
+  height: 100vh;
+  height: 100svh;
+  width: min(calc(100% - 80px), 1140px);
+  margin: 0 auto;
+  padding: clamp(24px, 3vh, 40px) 0;
+}
+
+/* The stage is a fixed-size frame; every step overlays it so swapping steps
+   never reflows the layout. GSAP crossfades between them on scrub (see
+   AnimationProvider). Without JS only the first step shows — graceful. */
+.process-stage {
+  position: relative;
+  height: var(--process-frame-height);
+}
+
+.process-slide {
+  position: absolute;
+  inset: 0;
+}
+
+.process-slide:not(:first-child) {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .process-grid {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 32px;
+  gap: 56px;
 }
 
 .process-copy {
@@ -685,43 +764,43 @@ img { object-fit: cover; }
   flex-direction: column;
   justify-content: space-between;
   width: 478px;
-  height: 673px;
+  height: var(--process-frame-height);
   flex-shrink: 0;
 }
 
 .process-number {
   font-family: var(--font-sans);
-  font-size: 180px;
+  font-size: 130px;
   font-weight: 500;
   color: var(--col-black);
   line-height: 0.336;
-  margin: 0 0 17px;
+  margin: 0 0 24px;
 }
 
 .process-title {
   font-family: var(--font-sans);
-  font-size: 44px;
+  font-size: 50px;
   font-weight: 500;
   color: var(--col-black);
   line-height: 1.12;
-  margin: 0 0 17px;
-  width: 433px;
+  margin: 0 0 24px;
+  width: 100%;
 }
 
 .process-body {
   font-family: var(--font-sans);
-  font-size: 22px;
+  font-size: 25px;
   font-weight: 300;
   color: var(--col-black);
-  line-height: 1.23;
+  line-height: 1.3;
   margin: 0;
 }
 
 .thumb-row {
   display: flex;
-  gap: 6px;
-  height: 142px;
-  margin-top: 21px;
+  gap: 10px;
+  height: 150px;
+  margin-top: 24px;
 }
 
 .thumb-row > div {
@@ -736,7 +815,7 @@ img { object-fit: cover; }
 .process-visual {
   position: relative;
   width: 516px;
-  height: 673px;
+  height: var(--process-frame-height);
   overflow: hidden;
   border-radius: 19px;
   flex-shrink: 0;
@@ -756,7 +835,7 @@ img { object-fit: cover; }
   box-shadow: inset 0px 60px 39px 0px rgba(255, 255, 255, 0.20);
   color: var(--col-white);
   font-family: var(--font-sans);
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 400;
   line-height: 1.41;
   text-align: justify;
@@ -768,9 +847,28 @@ img { object-fit: cover; }
    =========================== */
 
 .projects-section {
-  padding: 30px 0 60px;
+  position: relative;
+  /* Stage sticks for (height - 100svh). The morph finishes in the first ~100svh
+     of that; the rest is a deliberate hold on the full-size image before the
+     next section (see end:"+=innerHeight" in AnimationProvider). */
+  height: 380vh;
+  height: 380svh;
+  overflow: clip;
+}
+
+.projects-stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100vh;
+  height: 100svh;
+  padding: clamp(24px, 3vh, 30px) 0;
+  width: min(100%, 1140px);
   max-width: 1140px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .projects-header {
@@ -778,7 +876,7 @@ img { object-fit: cover; }
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  margin-bottom: 46px;
+  margin-bottom: clamp(20px, 3vh, 32px);
 }
 
 .projects-header h2 {
@@ -802,17 +900,28 @@ img { object-fit: cover; }
 }
 
 .project-frame {
+  --project-inset: 0%;
   position: relative;
   width: 100%;
-  height: 641px;
+  height: clamp(370px, calc(100svh - 230px), 641px);
   overflow: hidden;
+  clip-path: inset(
+    0 var(--project-inset) 0 var(--project-inset) round var(--r-card)
+  );
   border-radius: var(--r-card);
   box-shadow: var(--sh-project);
   background: transparent;
+  transform: translateZ(0);
+  will-change: clip-path;
+}
+
+.project-image {
+  transform-origin: center center;
+  will-change: transform;
 }
 
 .project-caption {
-  margin-top: 24px;
+  margin: clamp(12px, 2vh, 24px) 0 0;
   padding-left: 26px;
   border-left: 2px solid var(--col-brand);
   font-family: var(--font-sans);
@@ -1093,10 +1202,59 @@ img { object-fit: cover; }
     flex-direction: column;
   }
 
+  .process-section,
+  .projects-section {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .process-inner {
+    position: static;
+    height: auto;
+    width: 100%;
+    padding: 0;
+  }
+
   .process-copy,
   .process-visual {
     width: 100%;
     height: auto;
+  }
+
+  .process-visual {
+    aspect-ratio: 516 / 673;
+  }
+
+  /* No pin/scrub on mobile — show the first step only, in normal flow. */
+  .process-stage {
+    height: auto;
+  }
+
+  .process-slide:not(:first-child) {
+    display: none;
+  }
+
+  .process-slide:first-child {
+    position: static;
+  }
+
+  .projects-section {
+    padding: 0;
+  }
+
+  .projects-stage {
+    position: static;
+    height: auto;
+    min-height: auto;
+    width: 100%;
+    padding: 40px var(--section-px) 60px;
+    overflow: visible;
+  }
+
+  .project-frame {
+    height: auto;
+    aspect-ratio: 1140 / 641;
   }
 
   .process-number { font-size: 96px; }
@@ -1199,14 +1357,39 @@ img { object-fit: cover; }
 
 @media (prefers-reduced-motion: reduce) {
   .value-section { min-height: auto; }
-  .value-section__sticky { position: static; min-height: auto; }
+  .value-section__sticky {
+    position: static;
+    min-height: auto;
+    padding-block: var(--section-py);
+  }
   .value-copy span { opacity: 1; filter: none; }
+
+  .projects-section {
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+  }
+
+  .projects-stage {
+    position: static;
+  }
+
+  .project-frame {
+    --project-inset: 0%;
+  }
 
   .reveal-word,
   .reveal-block {
     animation: none;
     opacity: 1;
     filter: none;
+  }
+
+  .is-word-reveal-ready .word-reveal-word {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
   }
 
   .hero__scroll-chevron {

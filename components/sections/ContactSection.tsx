@@ -1,6 +1,10 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { AnimatedButton } from "@/components/AnimatedButton";
+import { getWordCount, WordReveal } from "@/components/WordReveal";
+
+const contactTitle = "Let's build it,";
+const contactEmphasis = "together.";
 
 const contactItems: Array<{ label: string; value: ReactNode }> = [
   {
@@ -26,9 +30,19 @@ export function ContactSection() {
     <section className="contact-section" id="contact" aria-labelledby="contact-title">
       <div className="contact-inner">
         <div className="contact-copy">
-          <h2 id="contact-title" className="cta-headline">
-            Let&apos;s build it,
-            <em>together.</em>
+          <h2
+            id="contact-title"
+            className="cta-headline"
+            data-word-reveal
+            data-word-reveal-speed="fast"
+          >
+            <WordReveal text={contactTitle} />
+            <em>
+              <WordReveal
+                text={contactEmphasis}
+                start={getWordCount(contactTitle)}
+              />
+            </em>
           </h2>
           <p className="cta-body">
             Tell us about your project. We&apos;ll come back with a tailored

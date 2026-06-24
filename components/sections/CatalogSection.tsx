@@ -1,4 +1,9 @@
 import Image from "next/image";
+import type { CSSProperties } from "react";
+import { getWordCount, WordReveal } from "@/components/WordReveal";
+
+const catalogTitle = "Catalogue";
+const catalogSub = "Sourced and quality-controlled in China.";
 
 const catalogItems = [
   {
@@ -43,12 +48,20 @@ export function CatalogSection() {
   return (
     <section className="catalog-section" id="catalog" aria-labelledby="catalog-title">
       <div className="catalog-inner">
-        <div className="section-header">
-          <h2 id="catalog-title">Catalogue</h2>
-          <p className="section-sub">Sourced and quality-controlled in China.</p>
+        <div
+          className="section-header"
+          data-word-reveal
+          data-word-reveal-speed="fast"
+        >
+          <h2 id="catalog-title">
+            <WordReveal text={catalogTitle} />
+          </h2>
+          <p className="section-sub">
+            <WordReveal text={catalogSub} start={getWordCount(catalogTitle)} />
+          </p>
         </div>
         <div className="catalog-grid">
-          {catalogItems.map((item) => (
+          {catalogItems.map((item, index) => (
             <article className="catalog-card" key={item.title}>
               <div className="catalog-card__image">
                 <Image
@@ -59,9 +72,34 @@ export function CatalogSection() {
                   style={{ objectFit: "cover" }}
                 />
               </div>
-              <p className="catalog-eyebrow">{item.eyebrow}</p>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
+              <div
+                className="catalog-card__copy"
+                data-word-reveal
+                data-word-reveal-speed="regular"
+                style={
+                  {
+                    "--word-reveal-delay": `${(index % 3) * 80}ms`
+                  } as CSSProperties
+                }
+              >
+                <p className="catalog-eyebrow">
+                  <WordReveal text={item.eyebrow} />
+                </p>
+                <h3>
+                  <WordReveal
+                    text={item.title}
+                    start={getWordCount(item.eyebrow)}
+                  />
+                </h3>
+                <p>
+                  <WordReveal
+                    text={item.description}
+                    start={
+                      getWordCount(item.eyebrow) + getWordCount(item.title)
+                    }
+                  />
+                </p>
+              </div>
             </article>
           ))}
         </div>
