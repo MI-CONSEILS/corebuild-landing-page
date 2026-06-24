@@ -1201,6 +1201,22 @@ img { object-fit: cover; }
   }
 }
 
+/* Tablet landscape — section is still pinned here, but the process row's fixed
+   widths (478 + 516 + gap) overflow the narrower viewport, so let the two
+   columns share the row fluidly. */
+@media (min-width: 901px) and (max-width: 1100px) {
+  .process-grid {
+    gap: 40px;
+  }
+
+  .process-copy,
+  .process-visual {
+    width: auto;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
 @media (max-width: 900px) {
   :root {
     --section-px: 32px;
@@ -1238,8 +1254,11 @@ img { object-fit: cover; }
   }
 
   .hero__sub {
-    width: 100%;
-    font-size: 20px;
+    align-self: start;
+    margin-top: 20px;
+    width: 240px;
+    max-width: 100%;
+    font-size: 18px;
   }
 
   .hero__actions {
@@ -1250,52 +1269,59 @@ img { object-fit: cover; }
     gap: 12px;
   }
 
-  .catalog-grid {
-    grid-template-columns: 1fr;
+  /* Give the "Why CoreBuild" title breathing room from the hero above it. */
+  .value-section__sticky {
+    align-content: start;
+    padding-top: 88px;
+  }
+
+  .value-copy { font-size: 28px; }
+
+  /* Process keeps the desktop pin/scrub on mobile too: the inner stays sticky
+     (no override here) and we just stack the copy over the visual, letting the
+     grid fill the pinned frame. The frame is sized so header + frame fit inside
+     one viewport — otherwise the sticky inner overflows and won't pin cleanly,
+     which reads as scroll "bounce". */
+  .process-section {
+    --process-frame-height: clamp(340px, calc(100svh - 200px), 540px);
+  }
+
+  .process-inner {
+    gap: 16px;
+    padding: 16px 0;
   }
 
   .process-grid {
     flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+    height: 100%;
   }
 
-  .process-section,
+  .process-copy {
+    width: 100%;
+    height: auto;
+  }
+
+  .process-copy__detail {
+    margin-top: 16px;
+  }
+
+  /* Thumbnails don't fit the stacked viewport-height frame — drop them. */
+  .thumb-row { display: none; }
+
+  .process-visual {
+    width: 100%;
+    height: auto;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Projects stays in normal flow on mobile (no pin). */
   .projects-section {
     height: auto;
     min-height: auto;
     overflow: visible;
-  }
-
-  .process-inner {
-    position: static;
-    height: auto;
-    width: 100%;
-    padding: 0;
-  }
-
-  .process-copy,
-  .process-visual {
-    width: 100%;
-    height: auto;
-  }
-
-  .process-visual {
-    aspect-ratio: 516 / 673;
-  }
-
-  /* No pin/scrub on mobile — show the first step only, in normal flow. */
-  .process-stage {
-    height: auto;
-  }
-
-  .process-slide:not(:first-child) {
-    display: none;
-  }
-
-  .process-slide:first-child {
-    position: static;
-  }
-
-  .projects-section {
     padding: 0;
   }
 
@@ -1318,6 +1344,9 @@ img { object-fit: cover; }
   .process-body { font-size: 18px; }
 
   .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+
+  /* "Request a quote" form sits above the contact info on mobile. */
+  .contact-form { order: -1; }
 
   .footer-inner {
     flex-direction: column;
@@ -1395,13 +1424,14 @@ img { object-fit: cover; }
     height: auto;
   }
 
-  .animated-button--arrow {
+  .hero__actions .animated-button--arrow {
     width: 100%;
   }
 
   .section-header h2 { font-size: 36px; }
   .cta-headline { font-size: 36px; }
   .footer-wordmark { font-size: 36px; }
+  .catalog-grid { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
   .value-section { min-height: 240vh; }
   .value-copy { font-size: 28px; }

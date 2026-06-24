@@ -118,6 +118,11 @@ export function AnimationProvider() {
       const Lenis = lenisMod.default;
 
       gsap.registerPlugin(ScrollTrigger);
+      // Mobile browsers fire resize when the address bar shows/hides on scroll;
+      // letting ScrollTrigger refresh on that makes pinned sections jump
+      // ("bounce"). The layout uses svh (stable across that resize) so ignoring
+      // it is safe. No-op on desktop.
+      ScrollTrigger.config({ ignoreMobileResize: true });
 
       const lenis = new Lenis({
         duration: 1.15,
@@ -347,7 +352,7 @@ export function AnimationProvider() {
       // scrub through the steps, crossfading one stacked slide to the next and
       // replaying each step's word-reveal as its number changes.
       const processMedia = gsap.matchMedia();
-      processMedia.add("(min-width: 901px)", () => {
+      processMedia.add("(min-width: 1px)", () => {
         const section = document.querySelector<HTMLElement>("[data-process-pin]");
         const slides = section
           ? gsap.utils.toArray<HTMLElement>("[data-process-slide]", section)
