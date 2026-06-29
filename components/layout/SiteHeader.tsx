@@ -1,25 +1,29 @@
 import { AnimatedButton } from "@/components/AnimatedButton";
 
-export function SiteHeader() {
+type SiteHeaderProps = {
+  rootPath?: string;
+};
+
+export function SiteHeader({ rootPath = "" }: SiteHeaderProps) {
   return (
     <header className="site-header">
-      <a className="brand" href="#home" aria-label="CoreBuild International home">
+      <a className="brand" href={`${rootPath}#home`} aria-label="CoreBuild International home">
         <span className="brand-name">CoreBuild</span>
         <span className="brand-sub">International</span>
       </a>
 
       <nav className="nav" aria-label="Main navigation">
-        <a className="nav-link--active" href="#home" aria-current="page">
+        <a className="nav-link--active" href={`${rootPath}#home`} aria-current="page">
           Home
         </a>
-        <a href="#catalog">Catalog</a>
-        <a href="#process">Process</a>
-        <a href="#contact">Contact</a>
+        <a href={`${rootPath}#catalog`}>Catalog</a>
+        <a href={`${rootPath}#process`}>Process</a>
+        <a href={`${rootPath}#contact`}>Contact</a>
       </nav>
 
       <AnimatedButton
         className="btn-start"
-        href="#contact"
+        href="/start"
         variant="arrow"
         aria-label="Start a project"
       >

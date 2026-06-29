@@ -1,3 +1,5 @@
+import { AnimatedButton } from "@/components/AnimatedButton";
+
 export function Footer() {
   return (
     <footer className="footer">
@@ -16,7 +18,17 @@ export function Footer() {
           <a href="#">Legal</a>
         </nav>
 
-        <p className="footer-copy">© 2024 CoreBuild International. All rights reserved.</p>
+        <div className="footer-end">
+          <AnimatedButton
+            href="/start"
+            variant="arrow"
+            className="btn-footer"
+            aria-label="Start a project"
+          >
+            Start a project
+          </AnimatedButton>
+          <p className="footer-copy">© 2024 CoreBuild International. All rights reserved.</p>
+        </div>
       </div>
     </footer>
   );
